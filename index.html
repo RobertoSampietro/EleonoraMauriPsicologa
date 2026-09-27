@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
 <title>Dott.ssa Eleonora Mauri - Psicologa Clinica, Lecco</title>
 <meta name="description" content="Dott.ssa Eleonora Mauri, psicologa clinica a Lecco. Colloqui individuali, familiari e online. Uno spazio per attraversare insieme ciò che pesa.">
 <style>
@@ -550,13 +551,18 @@
   .anon-field{ display:flex; flex-direction:column; gap:8px; }
   .anon-field label{ font-size:13px; color:var(--ink-soft); }
   .anon-field textarea{
+    appearance:none;
+    -webkit-appearance:none;
     background:var(--paper-deep);
     border:1px solid var(--line);
     border-radius:10px;
     padding:13px 14px;
     font-family:'Work Sans', sans-serif;
     font-size:15px;
-    color:var(--ink);
+    color:var(--ink) !important;
+    -webkit-text-fill-color:var(--ink);
+    caret-color:var(--ink);
+    color-scheme:light;
     min-height:90px;
     resize:vertical;
     outline:none;
@@ -605,11 +611,16 @@
   .field{ display:flex; flex-direction:column; gap:8px; }
   .field label{ font-size:13px; color:#C9D2CB; }
   .field input, .field textarea, .field select{
+    appearance:none;
+    -webkit-appearance:none;
     background:rgba(255,255,255,0.06);
     border:1px solid rgba(255,255,255,0.18);
     border-radius:10px;
     padding:13px 14px;
-    color:var(--paper);
+    color:var(--paper) !important;
+    -webkit-text-fill-color:var(--paper);
+    caret-color:var(--paper);
+    color-scheme:dark;
     font-family:'Work Sans', sans-serif;
     font-size:15px;
     outline:none;
@@ -633,6 +644,42 @@
   }
   .consent-check input{ margin-top:3px; width:16px; height:16px; flex-shrink:0; accent-color:var(--sage); }
   .consent-check a{ color:var(--paper); text-decoration:underline; }
+  .privacy-toggle{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    background:none;
+    border:1px solid var(--line);
+    border-radius:100px;
+    padding:12px 22px;
+    font-family:'Work Sans', sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    color:var(--sage-deep);
+    cursor:pointer;
+    margin-bottom:8px;
+  }
+  .privacy-toggle:hover{ border-color:var(--sage); }
+  .privacy-toggle-icon{
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--sage-pale);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+    transition:transform .3s ease;
+  }
+  .privacy-toggle.open .privacy-toggle-icon{ transform:rotate(45deg); }
+  .privacy-text{
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transition:max-height .5s ease, opacity .4s ease, margin-top .4s ease;
+  }
+  .privacy-text.open{
+    max-height:2000px;
+    opacity:1;
+    margin-top:22px;
+  }
   .privacy-text p{ color:var(--ink-soft); font-size:15px; line-height:1.7; margin-bottom:16px; }
   .privacy-text strong{ color:var(--ink); }
 
@@ -1004,14 +1051,16 @@
       <div class="section-head fade-up">
         <span class="eyebrow">Informativa</span>
         <h2>Privacy</h2>
+        <p>Come vengono trattati i dati che condividi tramite i moduli di questo sito.</p>
       </div>
-      <div class="privacy-text fade-up">
+      <button type="button" id="privacy-toggle" class="privacy-toggle">Leggi l'informativa completa <span class="privacy-toggle-icon">+</span></button>
+      <div class="privacy-text" id="privacy-text">
         <p><strong>Titolare del trattamento:</strong> Dott.ssa Eleonora Mauri, Studio di Psicologia Clinica, Via Fratelli Cairoli 60, Lecco - maurieleonora.psi@gmail.com</p>
         <p><strong>Dati raccolti:</strong> quando scrivi tramite i moduli di questo sito, i dati che inserisci (nome, email, telefono se fornito, contenuto del messaggio) vengono inviati direttamente alla mia casella email tramite il tuo programma di posta: il sito non li registra, non li salva su alcun server né li condivide con terzi.</p>
         <p><strong>Finalità:</strong> i dati sono trattati esclusivamente per rispondere alla tua richiesta e organizzare un eventuale colloquio.</p>
         <p><strong>Base giuridica:</strong> consenso dell'interessato (art. 6.1.a GDPR); per eventuali dati relativi alla sfera psicologica condivisi spontaneamente nel messaggio, consenso esplicito (art. 9.2.a GDPR).</p>
         <p><strong>Conservazione:</strong> i messaggi restano nella mia casella email fino a quando non decido di eliminarli, o su tua richiesta.</p>
-        <p><strong>Domande anonime:</strong> il modulo "domande anonime" non richiede né raccoglie alcun dato identificativo.</p>
+        <p><strong>Domande anonime:</strong> il modulo "domande anonime" non richiede né raccoglie alcun dato identificativo, ed è inviato tramite un servizio esterno che non trasmette a Eleonora l'indirizzo email di chi scrive.</p>
         <p><strong>Cookie:</strong> questo sito non utilizza cookie di tracciamento o di profilazione. I caratteri tipografici sono ospitati direttamente su questo sito, senza richieste a server esterni.</p>
         <p><strong>I tuoi diritti:</strong> puoi in ogni momento chiedere accesso, rettifica o cancellazione dei tuoi dati, scrivendo a maurieleonora.psi@gmail.com. Hai inoltre diritto di proporre reclamo al Garante per la Protezione dei Dati Personali (www.garanteprivacy.it).</p>
       </div>
@@ -1045,9 +1094,22 @@
     });
   });
 
-  // Domanda anonima -> apre il client email, senza chiedere alcun dato personale
+  // Informativa privacy: espandibile, chiusa di default
+  const privacyToggle = document.getElementById('privacy-toggle');
+  const privacyText = document.getElementById('privacy-text');
+  privacyToggle.addEventListener('click', ()=>{
+    privacyToggle.classList.toggle('open');
+    privacyText.classList.toggle('open');
+    privacyToggle.firstChild.textContent = privacyText.classList.contains('open')
+      ? "Nascondi l'informativa "
+      : "Leggi l'informativa completa ";
+  });
+
+  // Domanda anonima -> inviata tramite un servizio esterno (formsubmit.co),
+  // così il messaggio arriva senza rivelare l'indirizzo email di chi scrive
   const anonForm = document.getElementById('anon-form');
   const anonStatus = document.getElementById('anon-status');
+  const anonButton = anonForm.querySelector('button[type="submit"]');
   anonForm.addEventListener('submit', function(e){
     e.preventDefault();
     const domanda = document.getElementById('anon-domanda').value.trim();
@@ -1055,11 +1117,25 @@
       anonStatus.textContent = "Scrivi la tua domanda prima di inviare.";
       return;
     }
-    const subject = encodeURIComponent("Domanda anonima dal sito");
-    const body = encodeURIComponent(domanda);
-    window.location.href = "mailto:maurieleonora.psi@gmail.com?subject=" + subject + "&body=" + body;
-    anonStatus.textContent = "Si sta aprendo il tuo programma di posta: l'invio resta anonimo, non serve firmare il messaggio.";
-    anonForm.reset();
+    anonButton.disabled = true;
+    anonStatus.textContent = "Invio in corso...";
+    fetch('https://formsubmit.co/ajax/maurieleonora.psi@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: 'Domanda anonima dal sito',
+        domanda: domanda
+      })
+    })
+    .then(res => { if(!res.ok) throw new Error('invio fallito'); return res.json(); })
+    .then(() => {
+      anonStatus.textContent = "Domanda inviata in forma anonima. Grazie!";
+      anonForm.reset();
+    })
+    .catch(() => {
+      anonStatus.textContent = "Invio non riuscito. Riprova tra poco, oppure scrivi tramite il modulo contatti.";
+    })
+    .finally(() => { anonButton.disabled = false; });
   });
 
   const form = document.getElementById('contact-form');
