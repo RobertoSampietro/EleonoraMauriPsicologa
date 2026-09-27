@@ -539,38 +539,6 @@
   }
   .faq-a p{ color:var(--ink-soft); font-size:15.5px; max-width:640px; line-height:1.65; }
 
-  .anon-box{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    padding:34px;
-  }
-  .anon-box h3{ font-size:21px; margin-bottom:10px; }
-  .anon-box > p{ color:var(--ink-soft); font-size:15px; margin-bottom:20px; max-width:600px; }
-  .anon-box form{ display:flex; flex-direction:column; gap:16px; }
-  .anon-field{ display:flex; flex-direction:column; gap:8px; }
-  .anon-field label{ font-size:13px; color:var(--ink-soft); }
-  .anon-field textarea{
-    appearance:none;
-    -webkit-appearance:none;
-    background:var(--paper-deep);
-    border:1px solid var(--line);
-    border-radius:10px;
-    padding:13px 14px;
-    font-family:'Work Sans', sans-serif;
-    font-size:15px;
-    color:var(--ink) !important;
-    -webkit-text-fill-color:var(--ink);
-    caret-color:var(--ink);
-    color-scheme:light;
-    min-height:90px;
-    resize:vertical;
-    outline:none;
-    transition:border-color .2s;
-  }
-  .anon-field textarea:focus{ border-color:var(--sage); }
-  #anon-status{ font-size:14px; color:var(--sage-deep); min-height:18px; margin:0; }
-  .anon-disclaimer{ font-size:12.5px; color:var(--ink-soft); margin:0; opacity:0.8; }
 
   /* ---------- CONTATTI ---------- */
   .contact{
@@ -936,8 +904,8 @@
     <div class="container">
       <div class="section-head fade-up">
         <span class="eyebrow">Domande &amp; risposte</span>
-        <h2>Uno spazio di domande, anche in forma anonima</h2>
-        <p>Alcune delle domande che mi vengono rivolte più spesso. Se hai una curiosità che non trovi qui, puoi scrivermela in forma anonima qui sotto.</p>
+        <h2>Le domande più frequenti</h2>
+        <p>Alcune delle domande che mi vengono rivolte più spesso.</p>
       </div>
 
       <div class="faq-list fade-up">
@@ -953,20 +921,6 @@
           <button class="faq-q" type="button">Come capisco se ho bisogno di un percorso psicologico?<span class="faq-icon">+</span></button>
           <div class="faq-a"><p>Non serve una "ragione abbastanza grande" per chiedere supporto. Se una difficoltà, un pensiero ricorrente o un momento di cambiamento pesano più del solito, un primo colloquio conoscitivo può aiutare a capire da dove partire.</p></div>
         </div>
-      </div>
-
-      <div class="anon-box fade-up">
-        <h3>Fai una domanda in forma anonima</h3>
-        <p>Non è richiesto alcun dato: scrivi la tua domanda e invia. Potrebbe comparire, in forma anonima, tra le domande frequenti di questa pagina.</p>
-        <form id="anon-form">
-          <div class="anon-field">
-            <label for="anon-domanda">La tua domanda</label>
-            <textarea id="anon-domanda" name="domanda" required placeholder="Scrivi qui la tua domanda, in forma completamente anonima..."></textarea>
-          </div>
-          <button type="submit" class="btn btn-ghost" style="align-self:flex-start;">Invia in forma anonima</button>
-          <p class="anon-disclaimer">Anonimizzato tramite formsubmit.co: nessun nome, email o altro dato identificativo viene trasmesso.</p>
-          <p id="anon-status"></p>
-        </form>
       </div>
     </div>
   </section>
@@ -1062,7 +1016,6 @@
         <p><strong>Finalità:</strong> i dati sono trattati esclusivamente per rispondere alla tua richiesta e organizzare un eventuale colloquio.</p>
         <p><strong>Base giuridica:</strong> consenso dell'interessato (art. 6.1.a GDPR); per eventuali dati relativi alla sfera psicologica condivisi spontaneamente nel messaggio, consenso esplicito (art. 9.2.a GDPR).</p>
         <p><strong>Conservazione:</strong> i messaggi restano nella mia casella email fino a quando non decido di eliminarli, o su tua richiesta.</p>
-        <p><strong>Domande anonime:</strong> il modulo "domande anonime" non richiede né raccoglie alcun dato identificativo, ed è inviato tramite un servizio esterno che non trasmette a Eleonora l'indirizzo email di chi scrive.</p>
         <p><strong>Cookie:</strong> questo sito non utilizza cookie di tracciamento o di profilazione. I caratteri tipografici sono ospitati direttamente su questo sito, senza richieste a server esterni.</p>
         <p><strong>I tuoi diritti:</strong> puoi in ogni momento chiedere accesso, rettifica o cancellazione dei tuoi dati, scrivendo a maurieleonora.psi@gmail.com. Hai inoltre diritto di proporre reclamo al Garante per la Protezione dei Dati Personali (www.garanteprivacy.it).</p>
       </div>
@@ -1105,39 +1058,6 @@
     privacyToggle.firstChild.textContent = privacyText.classList.contains('open')
       ? "Nascondi l'informativa "
       : "Leggi l'informativa completa ";
-  });
-
-  // Domanda anonima -> inviata tramite un servizio esterno (formsubmit.co),
-  // così il messaggio arriva senza rivelare l'indirizzo email di chi scrive
-  const anonForm = document.getElementById('anon-form');
-  const anonStatus = document.getElementById('anon-status');
-  const anonButton = anonForm.querySelector('button[type="submit"]');
-  anonForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    const domanda = document.getElementById('anon-domanda').value.trim();
-    if(!domanda){
-      anonStatus.textContent = "Scrivi la tua domanda prima di inviare.";
-      return;
-    }
-    anonButton.disabled = true;
-    anonStatus.textContent = "Invio in corso...";
-    fetch('https://formsubmit.co/ajax/maurieleonora.psi@gmail.com', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        _subject: 'Domanda anonima dal sito',
-        domanda: domanda
-      })
-    })
-    .then(res => { if(!res.ok) throw new Error('invio fallito'); return res.json(); })
-    .then(() => {
-      anonStatus.textContent = "Domanda inviata in forma anonima. Grazie!";
-      anonForm.reset();
-    })
-    .catch(() => {
-      anonStatus.textContent = "Invio non riuscito. Riprova tra poco, oppure scrivi tramite il modulo contatti.";
-    })
-    .finally(() => { anonButton.disabled = false; });
   });
 
   const form = document.getElementById('contact-form');
